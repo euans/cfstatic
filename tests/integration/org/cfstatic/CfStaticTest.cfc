@@ -25,15 +25,13 @@
 			var failed = false;
 			rootDir &= 'badFiles/mixedMediaInPackage/';
 
-			cfstatic.init(
-				  staticDirectory = rootDir
-				, staticUrl       = "/any/old/thing"
-				, minifyMode      = "package"
-				, debugKey        = "doNotLetMxUnitDebugScrewTests"
-			);
-
 			try {
-				cfstatic.renderIncludes();
+				cfstatic.init(
+					  staticDirectory = rootDir
+					, staticUrl       = "/any/old/thing"
+					, minifyMode      = "package"
+					, debugKey        = "doNotLetMxUnitDebugScrewTests"
+				);
 
 			} catch ( "cfstatic.Package.badConfig" e ) {
 				failed = true;
@@ -48,14 +46,13 @@
 			var failed = false;
 			rootDir &= 'badFiles/mixedIeInPackage/';
 
-			cfstatic.init(
-				  staticDirectory = rootDir
-				, staticUrl       = "/any/old/thing"
-				, minifyMode      = "package"
-				, debugKey        = "doNotLetMxUnitDebugScrewTests"
-			);
 			try {
-				cfstatic.renderIncludes();
+				cfstatic.init(
+					  staticDirectory = rootDir
+					, staticUrl       = "/any/old/thing"
+					, minifyMode      = "package"
+					, debugKey        = "doNotLetMxUnitDebugScrewTests"
+				);
 
 			} catch ( "cfstatic.Package.badConfig" e ) {
 				failed = true;
@@ -70,15 +67,14 @@
 			var failed = false;
 			rootDir &= 'badFiles/mixedMediaInAll/';
 
-			cfstatic.init(
-				  staticDirectory = rootDir
-				, staticUrl       = "/any/old/thing"
-				, minifyMode      = "all"
-				, debugKey        = "doNotLetMxUnitDebugScrewTests"
-			);
-
 			try {
-				cfstatic.renderIncludes();
+				cfstatic.init(
+					  staticDirectory = rootDir
+					, staticUrl       = "/any/old/thing"
+					, minifyMode      = "all"
+					, debugKey        = "doNotLetMxUnitDebugScrewTests"
+				);
+
 			} catch ( "cfstatic.PackageCollection.badConfig" e ) {
 				failed = true;
 			}
@@ -91,15 +87,14 @@
 		<cfscript>
 			var failed = false;
 			rootDir &= 'badFiles/mixedIeInAll/';
-			cfstatic.init(
-				  staticDirectory = rootDir
-				, staticUrl       = "/any/old/thing"
-				, minifyMode      = "all"
-				, debugKey        = "doNotLetMxUnitDebugScrewTests"
-			);
 
 			try {
-				cfstatic.renderIncludes();
+				cfstatic.init(
+					  staticDirectory = rootDir
+					, staticUrl       = "/any/old/thing"
+					, minifyMode      = "all"
+					, debugKey        = "doNotLetMxUnitDebugScrewTests"
+				);
 
 			} catch ( "cfstatic.PackageCollection.badConfig" e ) {
 				failed = true;
@@ -242,7 +237,7 @@
 			expectedOutput = _fileRead( outputHtmlRoot & 'all_includes_all_mode.html' );
 			cfstatic.init(
 				  staticDirectory = rootDir
-				, staticUrl       = "/assets"
+				, staticUrl       = "/"
 				, minifyMode      = "all"
 				, debugKey        = "doNotLetMxUnitDebugScrewTests"
 			);
@@ -340,7 +335,8 @@
 				, minifyMode      = "file"
 				, debugKey        = "doNotLetMxUnitDebugScrewTests"
 			);
-			cfstatic.include('/css/less/testing.less');
+			cfstatic.include('/css/core/')
+			        .include('/css/another.css');
 
 			renderedOutput = cfstatic.renderIncludes('css');
 			AssertEquals( _cleanupRenderedOutput(expectedOutput), _cleanupRenderedOutput( renderedOutput ) );
@@ -370,6 +366,33 @@
 
 			renderedOutput = cfstatic.renderIncludes();
 			structDelete(url, 'doNotLetMxUnitDebugScrewTests');
+
+			AssertEquals( _cleanupRenderedOutput(expectedOutput), _cleanupRenderedOutput( renderedOutput ) );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t38_renderIncludes_shouldRenderSourceFiles_whenDebugModeSet" returntype="void">
+		<cfscript>
+			var renderedOutput = "";
+			var expectedOutput = "";
+			var outputHtmlRoot = ExpandPath( rootDir ) & 'renderedIncludes/';
+
+			rootDir &= 'goodFiles/standardFolders/';
+
+			expectedOutput = _fileRead( outputHtmlRoot & 'selected_raw_includes_package_mode.html' );
+			cfstatic.init(
+				  staticDirectory = rootDir
+				, staticUrl       = "/assets"
+				, minifyMode      = "package"
+				, debugKey        = "doNotLetMxUnitDebugScrewTests"
+				, debugPassword   = "thisIsATest"
+				, debug           = true
+			);
+
+			cfstatic.include('/css/someFolder/')
+			        .include('/js/core/');
+
+			renderedOutput = cfstatic.renderIncludes();
 
 			AssertEquals( _cleanupRenderedOutput(expectedOutput), _cleanupRenderedOutput( renderedOutput ) );
 		</cfscript>
@@ -434,7 +457,11 @@
 
 			rootDir &= 'goodFiles/simpleAllMode/';
 
-			expectedOutput = _fileRead( outputHtmlRoot & 'all_includes_plus_data_all_mode.html' );
+			if ( _isAdobeColdFusion() ) {
+				expectedOutput = _fileRead( outputHtmlRoot & 'all_includes_plus_data_all_mode_acf.html' );
+			} else {
+				expectedOutput = _fileRead( outputHtmlRoot & 'all_includes_plus_data_all_mode.html' );
+			}
 			cfstatic.init(
 				  staticDirectory = rootDir
 				, staticUrl       = "/assets"
@@ -470,7 +497,11 @@
 
 			rootDir &= 'goodFiles/standardFolders/';
 
-			expectedOutput = _fileRead( outputHtmlRoot & 'all_includes_package_mode_utf16.html' );
+			if ( _isAdobeColdFusion() ) {
+				expectedOutput = _fileRead( outputHtmlRoot & 'all_includes_package_mode_utf16_acf.html' );
+			} else {
+				expectedOutput = _fileRead( outputHtmlRoot & 'all_includes_package_mode_utf16.html' );
+			}
 			cfstatic.init(
 				  staticDirectory = rootDir
 				, staticUrl       = "/assets"
@@ -551,9 +582,9 @@
 
 			rootDir &= 'goodFiles/lessIncludesTest/';
 
-			globals = ListAppend( globals, ExpandPath(rootDir & 'css/less/globals/global1.less') );
-			globals = ListAppend( globals, ExpandPath(rootDir & 'css/less/globals/global2.less') );
-			globals = ListAppend( globals, ExpandPath(rootDir & 'globals/more.less') );
+			globals = ListAppend( globals, ExpandPath( rootDir & 'css/less/globals/global1.less' ) );
+			globals = ListAppend( globals, ExpandPath( rootDir & 'css/less/globals/global2.less' ) );
+			globals = ListAppend( globals, rootDir & 'globals/more.less' ); // mapped paths should work too
 
 			try {
 				cfstatic.init(
@@ -640,6 +671,419 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t27_cfstatic_shouldThrowError_whenOutputFolderDoesNotExistAndCannotBeCreated" returntype="void">
+		<cfscript>
+			var failed = false;
+			if ( _isAdobeColdFusion() ) {
+				try {
+					cfstatic.init(
+						  staticDirectory = "/nonexistant/dir/"
+						, staticUrl       = "/any/old/thing"
+						, minifyMode      = "none"
+						, debugKey        = "doNotLetMxUnitDebugScrewTests"
+					);
+
+				} catch ( "org.cfstatic.CfStatic.badOutputDir" e ) {
+					if ( e.message EQ "The output directory, '/nonexistant/dir/min', does not exist and could not be created by CfStatic." ) {
+						failed = true;
+					}
+				}
+
+				super.Assert( failed, "CfStatic did not throw an appropriate error when the output directory could not be created." );
+			}
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t28_renderIncludes_shouldRenderConfiguredJsVar_forRenderingData" returntype="void">
+		<cfscript>
+			var renderedOutput = "";
+			var expectedOutput = "";
+			var outputHtmlRoot = ExpandPath( rootDir ) & 'renderedIncludes/';
+			var dataToInclude  = StructNew();
+
+			rootDir &= 'goodFiles/standardFolders/';
+
+			cfstatic.init(
+				  staticDirectory     = rootDir
+				, staticUrl           = "/assets"
+				, debugKey            = "doNotLetMxUnitDebugScrewTests"
+				, includeAllByDefault = false
+				, jsDataVariable      = "_jsVarTest"
+			);
+			dataToInclude['someKey']          = ListToArray("1,2,3,4,7,8,9");
+			dataToInclude.anotherKey          = StructNew();
+			dataToInclude.anotherKey['fubar'] = "hello world";
+			dataToInclude.yetAnotherKey       = false;
+
+			if ( _isAdobeColdFusion() ) {
+				expectedOutput = _fileRead( outputHtmlRoot & 'rendered_data_with_configured_js_var_acf.html' );
+			} else {
+				expectedOutput = _fileRead( outputHtmlRoot & 'rendered_data_with_configured_js_var.html' );
+			}
+			renderedOutput = cfstatic.includeData( dataToInclude ).renderIncludes( 'js' );
+
+			expectedOutput = _cleanupRenderedOutput( expectedOutput );
+			renderedOutput = _cleanupRenderedOutput( renderedOutput );
+
+			if( _isBlueDragon() ){
+				AssertEquals( expectedOutput, renderedOutput );
+			} else {
+				AssertEqualsCase( expectedOutput, renderedOutput );
+			}
+
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t29_renderIncludes_shouldRenderFilesInTheCorrectOrder_whenDependencyFilesAreSupplied" returntype="void">
+		<cfscript>
+			var renderedOutput = "";
+			var expectedOutput = "";
+			var outputHtmlRoot = ExpandPath( rootDir ) & 'renderedIncludes/';
+
+			rootDir &= 'goodFiles/dependenciesFile/';
+
+			expectedOutput = _fileRead( outputHtmlRoot & 'all_includes_file_mode_from_dependency_file.html' );
+
+			cfstatic.init(
+				  staticDirectory   = rootDir
+				, staticUrl         = "/assets"
+				, minifyMode        = "file"
+				, debugKey          = "doNotLetMxUnitDebugScrewTests"
+				, jsDependencyFile  = rootDir & 'js.dependencies'
+				, cssDependencyFile = rootDir & 'css.dependencies'
+			);
+
+			renderedOutput = cfstatic.renderIncludes();
+			AssertEquals( _cleanupRenderedOutput( expectedOutput ), _cleanupRenderedOutput( renderedOutput ) );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t30_cfstatic_shouldThrowError_whenMissingDependenciesFoundInJsDependenciesFile" returntype="void">
+		<cfscript>
+			var outputHtmlRoot       = ExpandPath( rootDir ) & 'renderedIncludes/';
+			var expectedErrorMessage = "The dependency, '/ui-pages-do-not-exist/*.js', failed to match any files.";
+			var failed               = false;
+
+			rootDir &= 'goodFiles/dependenciesFile/';
+
+			try {
+				cfstatic.init(
+					  staticDirectory = rootDir
+					, staticUrl       = "/assets"
+					, minifyMode      = "file"
+					, debugKey        = "doNotLetMxUnitDebugScrewTests"
+					, jsDependencyFile = rootDir & 'bad.js.dependencies'
+				);
+			} catch ( "org.cfstatic.util.DependencyFileParser.missingDependency" e ) {
+				AssertEquals( expectedErrorMessage, e.detail );
+				failed = true;
+			}
+
+			super.Assert( failed, "CfStatic did not throw a suitable error when the js dependencies file contained bad file paths.");
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t31_renderIncludes_shouldOnlyRenderSelectedIncludes_withSuppliedJsDepenenciesFile" returntype="void">
+		<cfscript>
+			var renderedOutput = "";
+			var expectedOutput = "";
+			var outputHtmlRoot = ExpandPath( rootDir ) & 'renderedIncludes/';
+
+			rootDir &= 'goodFiles/dependenciesFile/';
+
+			expectedOutput = _fileRead( outputHtmlRoot & 'selected_js_includes_file_mode_from_dependencies_file.html' );
+			cfstatic.init(
+				  staticDirectory = rootDir
+				, staticUrl       = "/assets"
+				, minifyMode      = "file"
+				, jsDependencyFile = rootDir & 'js.dependencies'
+				, debugKey        = "doNotLetMxUnitDebugScrewTests"
+			);
+			cfstatic.include('/js/folder/some.js')
+			        .include('/js/ui-pages/');
+
+			renderedOutput = cfstatic.renderIncludes('js');
+
+			AssertEquals( _cleanupRenderedOutput( expectedOutput ), _cleanupRenderedOutput( renderedOutput ) );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t32_renderIncludes_shouldOnlyRenderSelectedIncludes_withSuppliedJsDepenenciesFile_packageMode" returntype="void">
+		<cfscript>
+			var renderedOutput = "";
+			var expectedOutput = "";
+			var outputHtmlRoot = ExpandPath( rootDir ) & 'renderedIncludes/';
+
+			rootDir &= 'goodFiles/dependenciesFile/';
+
+			expectedOutput = _fileRead( outputHtmlRoot & 'selected_js_includes_package_mode_from_dependencies_file.html' );
+			cfstatic.init(
+				  staticDirectory = rootDir
+				, staticUrl       = "/assets"
+				, minifyMode      = "package"
+				, jsDependencyFile = rootDir & 'js.dependencies'
+				, debugKey        = "doNotLetMxUnitDebugScrewTests"
+			);
+			cfstatic.include('/js/folder/some.js')
+			        .include('/js/ui-pages/');
+
+			renderedOutput = cfstatic.renderIncludes('js');
+
+			AssertEquals( _cleanupRenderedOutput( expectedOutput ), _cleanupRenderedOutput( renderedOutput ) );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t33_renderIncludes_shouldOnlyRenderConditionalDependencies_whenTheyAreExplicitlyIncluded" returntype="void">
+		<cfscript>
+			var renderedOutput = "";
+			var expectedOutput = "";
+			var outputHtmlRoot = ExpandPath( rootDir ) & 'renderedIncludes/';
+
+			rootDir &= 'goodFiles/dependenciesFile/';
+
+			cfstatic.init(
+				  staticDirectory = rootDir
+				, staticUrl       = "/assets"
+				, minifyMode      = "file"
+				, jsDependencyFile = rootDir & 'js.dependencies'
+				, debugKey        = "doNotLetMxUnitDebugScrewTests"
+			);
+			cfstatic.include('/js/shared/jqGrid/jqGrid.js').include('/js/shared/jqGrid/locales/de.js');
+
+			renderedOutput = cfstatic.renderIncludes('js');
+			expectedOutput = _fileRead( outputHtmlRoot & 'conditional_js_includes_no_dependencies_included.html' );
+
+			AssertEquals( _cleanupRenderedOutput( expectedOutput ), _cleanupRenderedOutput( renderedOutput ) );
+
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t34_renderIncludes_shouldOnlyRenderConditionalDependencies_whenTheyAreExplicitlyIncluded_packageMode" returntype="void">
+		<cfscript>
+			var renderedOutput = "";
+			var expectedOutput = "";
+			var outputHtmlRoot = ExpandPath( rootDir ) & 'renderedIncludes/';
+
+			rootDir &= 'goodFiles/dependenciesFile/';
+
+			cfstatic.init(
+				  staticDirectory = rootDir
+				, staticUrl       = "/assets"
+				, minifyMode      = "package"
+				, jsDependencyFile = rootDir & 'js.dependencies'
+				, debugKey        = "doNotLetMxUnitDebugScrewTests"
+			);
+
+			renderedOutput = cfstatic.include('/js/shared/jqGrid/jqGrid.js').renderIncludes('js');
+			expectedOutput = _fileRead( outputHtmlRoot & 'conditional_js_includes_no_dependencies_included_package.html' );
+
+			AssertEquals( _cleanupRenderedOutput( expectedOutput ), _cleanupRenderedOutput( renderedOutput ) );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t35_renderIncludes_shouldRenderEmptyString_onSecondCall" returntype="void">
+		<cfscript>
+			var renderedOutput = "";
+			var data = StructNew();
+
+			rootDir &= 'goodFiles/standardFolders/';
+
+			cfstatic.init(
+				  staticDirectory     = rootDir
+				, staticUrl           = "/assets"
+				, minifyMode          = "file"
+				, includeAllByDefault = false
+				, debugKey            = "doNotLetMxUnitDebugScrewTests"
+			);
+
+			data.fubar = "fubar";
+
+			cfstatic.include('/css/core/')
+			        .include('/js/core/')
+			        .includeData( data );
+
+			renderedOutput = cfstatic.renderIncludes('js');
+			super.Assert( Len(Trim(renderedOutput)), "Rendering JS includes was expected to render something - empty instead" );
+			renderedOutput = cfstatic.renderIncludes('js');
+			super.Assert( not Len(Trim(renderedOutput)), "Rendering JS includes a second time was expected to render nothing but something was rendered instead." );
+
+			renderedOutput = cfstatic.renderIncludes('css');
+			super.Assert( Len(Trim(renderedOutput)), "Rendering CSS includes was expected to render something - empty instead" );
+			renderedOutput = cfstatic.renderIncludes('css');
+			super.Assert( not Len(Trim(renderedOutput)), "Rendering CSS includes a second time was expected to render nothing but something was rendered instead." );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t36_cfstatic_shouldNotBlowUp_whenOutputDirIsBeneathEitherJsOrCssDirectories" returntype="void">
+		<cfscript>
+			var renderedOutput = "";
+			var expectedOutput = "";
+			var outputHtmlRoot = ExpandPath( rootDir ) & 'renderedIncludes/';
+
+			rootDir &= 'goodFiles/outputDirWithinCssDir/';
+
+			expectedOutput = _fileRead( outputHtmlRoot & 'all_includes_package_mode_output_within_css_dir.html' );
+			cfstatic.init(
+				  staticDirectory  = rootDir
+				, staticUrl        = "/assets/"
+				, outputDirectory  = "css/min"
+				, minifyMode       = "package"
+				, forceCompilation = true
+				, debugKey         = "doNotLetMxUnitDebugScrewTests"
+			);
+			renderedOutput = cfstatic.renderIncludes();
+			AssertEquals( _cleanupRenderedOutput(expectedOutput), _cleanupRenderedOutput( renderedOutput ) );
+
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t37_cfstatic_shouldNotDeleteAllFiles_whenInCheckForUpdatesMode" returntype="void">
+		<cfscript>
+			var renderedOutput = "";
+			var data = StructNew();
+
+			rootDir &= 'goodFiles/standardFolders/';
+
+			cfstatic.init(
+				  staticDirectory = rootDir
+				, staticUrl       = "/assets"
+				, minifyMode      = "file"
+				, checkForUpdates = true
+				, debugKey        = "doNotLetMxUnitDebugScrewTests"
+			);
+
+			cfstatic.include('/css/core/');
+
+			super.Assert( _directoryList( rootDir & 'min' ).recordCount, "The output directory was emptied after include() call, oops.");
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t39_cfstatic_shouldRebuildSourceFiles_whenChangesToDependencyFilesAreDetected" returntype="void">
+		<cfscript>
+			var renderedOutput = "";
+			var expectedOutput = "";
+			var outputHtmlRoot = ExpandPath( rootDir ) & 'renderedIncludes/';
+			var tmpFile        = GetTempFile('/tmp', 'test' );
+
+			rootDir &= 'goodFiles/dependenciesFile/';
+
+			_fileCopy( rootDir & 'js.dependencies', tmpFile );
+
+			expectedOutput = _fileRead( outputHtmlRoot & 'selected_js_includes_package_mode_from_dependencies_file.html' );
+			cfstatic.init(
+				  staticDirectory  = rootDir
+				, staticUrl        = "/assets"
+				, minifyMode       = "package"
+				, jsDependencyFile = tmpFile
+				, debugKey         = "doNotLetMxUnitDebugScrewTests"
+				, checkForUpdates  = true
+			);
+			cfstatic.include('/js/folder/some.js')
+			        .include('/js/ui-pages/');
+
+			renderedOutput = cfstatic.renderIncludes('js');
+
+			AssertEquals( _cleanupRenderedOutput( expectedOutput ), _cleanupRenderedOutput( renderedOutput ) );
+
+			_fileWrite( tmpFile, "" ); // clear the dependencies (brute force! cfstatic should pick up this change)
+			StructClear( request );
+
+			renderedOutput = cfstatic.renderIncludes('js');
+			AssertNOTEquals( _cleanupRenderedOutput( expectedOutput ), _cleanupRenderedOutput( renderedOutput ) );
+
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t40_include_shouldThrowAnError_whenIncludeDoesNotExistsAndThrowOnMissingIsSetToTrue" returntype="void">
+		<cfscript>
+			var errorThrown = false;
+
+			rootDir &= 'goodFiles/standardFolders/';
+
+			cfstatic.init(
+				  staticDirectory = rootDir
+				, staticUrl       = "/assets"
+				, debugKey        = "doNotLetMxUnitDebugScrewTests"
+			);
+
+			try {
+				cfstatic.include( resource='/css/core/iDoNotExist.css', throwOnMissing=true );
+			} catch( "cfstatic.missing.include" e ) {
+				super.assertEquals( "CfStatic include() error: The requested include, [/css/core/iDoNotExist.css], does not exist.", e.message );
+				errorThrown = true;
+			}
+
+			super.assert( errorThrown, "An informative error was not thrown" );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t41_includeShouldNotThrowAnError_whenIncludeExistsAndThrowOnMissingIsSetToTrue" returntype="void">
+		<cfscript>
+			var errorThrown = false;
+
+			rootDir &= 'goodFiles/standardFolders/';
+
+			cfstatic.init(
+				  staticDirectory = rootDir
+				, staticUrl       = "/assets"
+				, debugKey        = "doNotLetMxUnitDebugScrewTests"
+			);
+
+			try {
+				cfstatic.include( resource='/css/core/', throwOnMissing=true );
+				cfstatic.include( resource='/css/someFolder/someCss.css', throwOnMissing=true );
+			} catch( any e ) {
+				errorThrown = true;
+			}
+
+			super.assertFalse( errorThrown, "An error was thrown and it should't have been, the resource exists!" );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t42_include_shouldThrowAnError_whenIncludeDoesNotExistAndThrowOnMissingIsGloballyDefaultedToTrue" returntype="void">
+		<cfscript>
+			var errorThrown = false;
+
+			rootDir &= 'goodFiles/standardFolders/';
+
+			cfstatic.init(
+				  staticDirectory       = rootDir
+				, staticUrl             = "/assets"
+				, debugKey              = "doNotLetMxUnitDebugScrewTests"
+				, throwOnMissingInclude = true
+			);
+
+			try {
+				cfstatic.include( '/js/whatever/' );
+			} catch( "cfstatic.missing.include" e ) {
+				super.assertEquals( "CfStatic include() error: The requested include, [/js/whatever/], does not exist.", e.message );
+				errorThrown = true;
+			}
+
+			super.assert( errorThrown, "An informative error was not thrown" );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t43_getIncludeUrl_shouldReturnUrlOfSpecifiedAsset" returntype="void">
+		<cfscript>
+			var expected = "/mystaticurl/min/someFolder.min.css";
+			var actual   = "";
+
+			rootDir &= 'goodFiles/standardFolders/';
+
+			cfstatic.init(
+				  staticDirectory = rootDir
+				, staticUrl       = "/mystaticurl"
+				, debugKey        = "doNotLetMxUnitDebugScrewTests"
+			);
+
+			actual = cfstatic.getIncludeUrl( "css", "/someFolder/" );
+			actual = _removeCheckSumFromFileNames( actual );
+
+			super.assertEquals( expected, actual );
+		</cfscript>
+	</cffunction>
+
 <!--- private helpers --->
 	<cffunction name="_getResourcePath" access="private" returntype="string" output="false">
 		<cfreturn '/tests/integration/resources/' />
@@ -653,17 +1097,16 @@
 		<cfif DirectoryExists(ExpandPath(dir))>
 			<cfdirectory action="list" directory="#ExpandPath(dir)#" name="files" />
 			<cfloop query="files">
-				<cfif ListFindNoCase('js,css', ListLast(name, '.'))>
-			    	<cffile action="delete" file="#directory#/#name#" />
-			    </cfif>
+		    	<cffile action="delete" file="#files.directory#/#files.name#" />
 			</cfloop>
+			<cfdirectory action="delete" directory="#ExpandPath(dir)#" />
 		</cfif>
 
 		<!--- compiled less files --->
 		<cfdirectory action="list" directory="#ExpandPath(rootDir)#" filter="*.less.css" recurse="true" name="files" />
 		<cfloop query="files">
-			<cfif type EQ "file">
-				<cffile action="delete" file="#directory#/#name#" />
+			<cfif files.type EQ "file">
+				<cffile action="delete" file="#files.directory#/#files.name#" />
 			</cfif>
 		</cfloop>
 
@@ -671,10 +1114,15 @@
 		<cfif DirectoryExists( ExpandPath( rootDir & '/js') )>
 			<cfdirectory action="list" directory="#ExpandPath(rootDir)#/js" filter="*.coffee.js" recurse="true" name="files" />
 			<cfloop query="files">
-				<cfif type EQ "file">
-					<cffile action="delete" file="#directory#/#name#" />
+				<cfif files.type EQ "file">
+					<cffile action="delete" file="#files.directory#/#files.name#" />
 				</cfif>
 			</cfloop>
+		</cfif>
+
+		<!--- state cache file --->
+		<cfif FileExists( rootDir & "/.cfstaticstatecache" )>
+			<cffile action="delete" file="#rootDir#/.cfstaticstatecache" />
 		</cfif>
 	</cffunction>
 
@@ -701,7 +1149,7 @@
 		<cfloop query="files1">
 			<cfif files1.type EQ 'file'>
 				<cfset file1 = ListAppend(files1.directory, files1.name, '/') />
-				<cfset file2 = _findEquivalentFileThatMayHaveDifferentTimestamp(files1.name, ValueList(files2.name)) />
+				<cfset file2 = _findEquivalentFileThatMayHaveDifferentCheckSum(files1.name, ValueList(files2.name)) />
 
 				<cfset super.Assert( file2 NEQ "", "The two folders did not contain the same files. Folder 1: #ValueList(files1.name)#. Folder 2: #ValueList(files2.name)#") />
 				<cfset subFolder = ReplaceNoCase( files1.directory, folder1, '' ) />
@@ -726,14 +1174,28 @@
 		<cfreturn Replace(content, Chr(13), '', 'all') />
 	</cffunction>
 
-	<cffunction name="_findEquivalentFileThatMayHaveDifferentTimestamp" access="private" returntype="string" output="false">
+	<cffunction name="_fileWrite" access="private" returntype="void" output="false">
+		<cfargument name="filePath" type="string" required="true" />
+		<cfargument name="content" type="string" required="true" />
+
+		<cffile action="write" file="#filePath#" output="#content#" />
+	</cffunction>
+
+	<cffunction name="_fileCopy" access="private" returntype="void" output="false">
+		<cfargument name="source"      type="string" required="true" />
+		<cfargument name="destination" type="string" required="true" />
+
+		<cffile action="copy" source="#source#" destination="#destination#"  />
+	</cffunction>
+
+	<cffunction name="_findEquivalentFileThatMayHaveDifferentCheckSum" access="private" returntype="string" output="false">
 		<cfargument name="fileName"           type="string" required="true" />
 		<cfargument name="equivalentFileList" type="any"    required="true" />
 
 		<cfset var equivFile        = "" />
-		<cfset var strippedFileName = _removeTimeStampFromFileNames(arguments.fileName) />
+		<cfset var strippedFileName = _removeCheckSumFromFileNames(arguments.fileName) />
 		<cfloop list="#arguments.equivalentFileList#" index="equivFile">
-			<cfif _removeTimeStampFromFileNames(equivFile) EQ strippedFileName>
+			<cfif _removeCheckSumFromFileNames(equivFile) EQ strippedFileName>
 				<cfreturn equivFile />
 			</cfif>
 		</cfloop>
@@ -741,10 +1203,10 @@
 		<cfreturn "" />
 	</cffunction>
 
-	<cffunction name="_removeTimeStampFromFileNames" access="private" returntype="string" output="false">
+	<cffunction name="_removeCheckSumFromFileNames" access="private" returntype="string" output="false">
 		<cfargument name="fileName" type="string" required="true" />
 
-		<cfreturn ReReplace( arguments.fileName, '\.[0-9]{14}', "", "all" ) />
+		<cfreturn ReReplace( arguments.fileName, '\.[0-9A-F]{32}', "", "all" ) />
 	</cffunction>
 
 	<cffunction name="_removeNewLines" access="private" returntype="string" output="false">
@@ -756,11 +1218,23 @@
 	<cffunction name="_cleanupRenderedOutput" access="private" returntype="string" output="false">
 		<cfargument name="renderedOutput" type="string" required="true" />
 
-		<cfreturn _removeNewLines( _removeTimeStampFromFileNames( arguments.renderedOutput ) ) />
+		<cfreturn _removeNewLines( _removeCheckSumFromFileNames( arguments.renderedOutput ) ) />
 	</cffunction>
 
 	<cffunction name="_isBlueDragon" returntype="boolean" access="private" output="false">
 		<cfreturn StructKeyExists( server, 'bluedragon' ) />
+	</cffunction>
+
+	<cffunction name="_isAdobeColdFusion" returntype="boolean" access="private" output="false">
+		<cfreturn server.coldfusion.productName EQ "ColdFusion Server" />
+	</cffunction>
+
+	<cffunction name="_directoryList" access="private" returntype="query" output="false">
+		<cfargument name="dir" type="string" required="true" />
+
+		<cfset files = "" />
+		<cfdirectory action="list" directory="#dir#" name="files" />
+		<cfreturn files />
 	</cffunction>
 
 </cfcomponent>
