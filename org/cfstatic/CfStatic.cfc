@@ -299,7 +299,7 @@
 			for( i=1; i LTE ArrayLen( files ); i++ ){
 				mappings = _getIncludeMappingsForFile(
 					  filePath   = files[i]
-					, file       = package.getStaticFile( files[i] )
+					, _file       = package.getStaticFile( files[i] )
 					, pkgInclude = include
 					, mappings   = mappings
 				);
@@ -311,13 +311,13 @@
 
 	<cffunction name="_getIncludeMappingsForFile" access="private" returntype="struct" output="false">
 		<cfargument name="filePath"   type="string" required="true" />
-		<cfargument name="file"       type="any"    required="true" />
+		<cfargument name="_file"       type="any"    required="true" />
 		<cfargument name="pkgInclude" type="string" required="true" />
 		<cfargument name="mappings"   type="struct" required="true" />
 
 		<cfscript>
 			var include      = filePath;
-			var dependencies = file.getDependencies( recursive = true, includeConditionals = false );
+			var dependencies = _file.getDependencies( recursive = true, includeConditionals = false );
 			var i            = 1;
 
 			if ( pkgInclude NEQ 'externals' ) {
@@ -456,7 +456,7 @@
 			var packages   = "";
 			var package    = "";
 			var files      = "";
-			var file       = "";
+			var _file       = "";
 			var i          = 0;
 			var n          = 0;
 			var x          = 0;
@@ -476,13 +476,13 @@
 					files   = package.getOrdered();
 
 					for( x=1; x LTE ArrayLen( files ); x=x+1 ) {
-						file        = package.getStaticFile( files[x] );
+						_file        = package.getStaticFile( files[x] );
 
 						_addRenderedIncludeToCache(
 							  type     = type
 							, path     = files[x]
 							, debug    = debug
-							, rendered = file.renderInclude(
+							, rendered = _file.renderInclude(
 								minified  = minified and ( packages[i] neq 'external' or _getDownloadExternals() )
 							)
 						);
@@ -608,20 +608,20 @@
 			var files           = $directoryList(cssDir, '*.less');
 			var globalsModified = _getLessGlobalsLastModified();
 			var i               = 0;
-			var file            = "";
+			var _file            = "";
 			var target          = "";
 			var compiled        = "";
 			var needsCompiling  = "";
 			var lastModified    = "";
 
 			for( i=1; i LTE files.recordCount; i++ ){
-				file = $normalizeUnixAndWindowsPaths( $listAppend( files.directory[i], files.name[i], '/') );
-				if ( $shouldFileBeIncluded( file, _getIncludePattern(), _getExcludePattern() ) ){
-					target         = file & '.css';
+				_file = $normalizeUnixAndWindowsPaths( $listAppend( files.directory[i], files.name[i], '/') );
+				if ( $shouldFileBeIncluded( _file, _getIncludePattern(), _getExcludePattern() ) ){
+					target         = _file & '.css';
 					lastModified   = $fileLastModified(target);
-					needsCompiling = ( _getForceCompilation() or not fileExists(target) or lastModified LT globalsModified or lastModified LT $fileLastModified(file) );
+					needsCompiling = ( _getForceCompilation() or not fileExists(target) or lastModified LT globalsModified or lastModified LT $fileLastModified(_file) );
 					if ( needsCompiling ){
-						compiled = _getLesscompiler().compile( file, _getLessGlobals() );
+						compiled = _getLesscompiler().compile( _file, _getLessGlobals() );
 
 						$fileWrite( target, compiled, _getOutputCharset() );
 					}
@@ -635,18 +635,18 @@
 			var jsDir           = $listAppend(_getRootdirectory(), _getJsdirectory(), '/');
 			var files           = $directoryList(jsDir, '*.coffee');
 			var i               = 0;
-			var file            = "";
+			var _file            = "";
 			var target          = "";
 			var compiled        = "";
 			var needsCompiling  = "";
 
 			for( i=1; i LTE files.recordCount; i++ ){
-				file = $normalizeUnixAndWindowsPaths( $listAppend(files.directory[i], files.name[i], '/') );
+				_file = $normalizeUnixAndWindowsPaths( $listAppend(files.directory[i], files.name[i], '/') );
 				if ( $shouldFileBeIncluded( file, _getIncludePattern(), _getExcludePattern() ) ){
-					target         = file & '.js';
+					target         = _file & '.js';
 					needsCompiling = ( _getForceCompilation() or not fileExists(target) or $fileLastModified(target) LT $fileLastModified(file) );
 					if ( needsCompiling ){
-						compiled = _getCoffeeScriptCompiler().compile( file );
+						compiled = _getCoffeeScriptCompiler().compile( _file );
 
 						$fileWrite( target, Trim(compiled), _getOutputCharset() );
 					}
@@ -660,7 +660,7 @@
 			var packages	= "";
 			var package		= "";
 			var files		= "";
-			var file		= "";
+			var _file		= "";
 			var content		= $getStringBuffer();
 			var i			= "";
 			var n			= "";
@@ -675,8 +675,8 @@
 						files	= package.getOrdered();
 
 						for( n=1; n LTE ArrayLen(files); n++ ){
-							file = package.getStaticFile( files[n] );
-							content.append( _compileJsFile( file ) );
+							_file = package.getStaticFile( files[n] );
+							content.append( _compileJsFile( _file ) );
 						}
 					}
 				}
@@ -694,8 +694,8 @@
 					files	= package.getOrdered();
 
 					for( n=1; n LTE ArrayLen(files); n++ ){
-						file = package.getStaticFile( files[n] );
-						content.append( _compileCssFile( file ) );
+						_file = package.getStaticFile( files[n] );
+						content.append( _compileCssFile( _file ) );
 					}
 				}
 
@@ -713,7 +713,7 @@
 			var packages = "";
 			var package  = "";
 			var files    = "";
-			var file     = "";
+			var _file     = "";
 			var content  = "";
 			var i        = "";
 			var n        = "";
@@ -731,8 +731,8 @@
 					files = package.getOrdered();
 
 					for( n=1; n LTE ArrayLen(files); n++ ){
-						file = package.getStaticFile( files[n] );
-						content.append( _compileJsFile( file ) );
+						_file = package.getStaticFile( files[n] );
+						content.append( _compileJsFile( _file ) );
 					}
 
 					filePath = $listAppend( _getOutputDirectory(), filename, '/' );
@@ -752,8 +752,8 @@
 					files = package.getOrdered();
 
 					for( n=1; n LTE ArrayLen(files); n++ ){
-						file = package.getStaticFile( files[n] );
-						content.append( _compileCssFile( file ) );
+						_file = package.getStaticFile( files[n] );
+						content.append( _compileCssFile( _file ) );
 					}
 
 					filePath = $listAppend( _getOutputDirectory(), filename, '/' );
@@ -772,7 +772,7 @@
 			var packages = "";
 			var package  = "";
 			var files    = "";
-			var file     = "";
+			var _file     = "";
 			var content  = "";
 			var i        = "";
 			var n        = "";
@@ -787,11 +787,11 @@
 					files   = package.getOrdered();
 
 					for( n=1; n LTE ArrayLen(files); n++ ){
-						file     = package.getStaticFile( files[n] );
-						fileName = file.getMinifiedFileName();
+						_file     = package.getStaticFile( files[n] );
+						fileName = _file.getMinifiedFileName();
 
-						if ( _compilationNecessary( file ) ) {
-							content	 = _compileJsFile( file );
+						if ( _compilationNecessary( _file ) ) {
+							content	 = _compileJsFile( _file );
 							filePath = $listAppend( _getOutputDirectory(), filename, '/' );
 							$fileWrite( filePath, content, _getOutputCharset() );
 						}
@@ -807,11 +807,11 @@
 					files   = package.getOrdered();
 
 					for( n=1; n LTE ArrayLen(files); n++ ){
-						file     = package.getStaticFile( files[n] );
-						fileName = file.getMinifiedFileName();
+						_file     = package.getStaticFile( files[n] );
+						fileName = _file.getMinifiedFileName();
 
-						if ( _compilationNecessary( file ) ) {
-							content  = _compileCssFile( file );
+						if ( _compilationNecessary( _file ) ) {
+							content  = _compileCssFile( _file );
 							filePath = $listAppend( _getOutputDirectory(), filename, '/' );
 							$fileWrite( filePath, content, _getOutputCharset() );
 						}
@@ -825,32 +825,32 @@
 	</cffunction>
 
 	<cffunction name="_compileJsFile" access="private" returntype="string" output="false" hint="I compile a single js file, returning the compiled string">
-		<cfargument name="file" type="org.cfstatic.core.StaticFile" required="true" hint="The staticFile object representing the javascript file to compile" />
+		<cfargument name="_file" type="org.cfstatic.core.StaticFile" required="true" hint="The staticFile object representing the javascript file to compile" />
 
 		<cfscript>
-			var alreadyMinified = file.getProperty('minified', 'false', 'string');
+			var alreadyMinified = _file.getProperty('minified', 'false', 'string');
 
 			if ( alreadyMinified ) {
-				return file.getContent();
+				return _file.getContent();
 			}
 
-			return _getYuiCompressor().compressJs( file.getContent() );
+			return _getYuiCompressor().compressJs( _file.getContent() );
 		</cfscript>
     </cffunction>
 
 	<cffunction name="_compileCssFile" access="private" returntype="string" output="false" hint="I compile a single css file, returning the compiled string">
-		<cfargument name="file" type="org.cfstatic.core.StaticFile" required="true" hint="The staticFile object representing the css file to compile" />
+		<cfargument name="_file" type="org.cfstatic.core.StaticFile" required="true" hint="The staticFile object representing the css file to compile" />
 
 		<cfscript>
-			var content         = file.getContent();
-			var alreadyMinified = file.getProperty('minified', 'false', 'string');
+			var content         = _file.getContent();
+			var alreadyMinified = _file.getProperty('minified', 'false', 'string');
 
 			if ( not alreadyMinified ) {
 				content = _getYuiCompressor().compressCss( content );
 			}
 			content	= _getCssImageParser().parse(
 				  source           = content
-				, filePath         = file.getPath()
+				, filePath         = _file.getPath()
 				, embedImagesRegex = _getEmbedCssImages()
 				, addCachebusters  = _getAddImageCacheBusters()
 			);
@@ -1407,13 +1407,13 @@
 		<cfscript>
 			var cssDir = $listAppend(_getRootdirectory(), _getCssdirectory(), '/');
 			var files  = $directoryList( cssDir, '*.less' );
-			var file   = "";
+			var _file   = "";
 			var i      = "";
 
 			for( i=1; i LTE files.recordCount; i++ ){
-				file = $normalizeUnixAndWindowsPaths( $listAppend( files.directory[i], files.name[i], '/') );
-				if ( $isTemporaryFileName( file ) ) {
-					$fileDelete( file );
+				_file = $normalizeUnixAndWindowsPaths( $listAppend( files.directory[i], files.name[i], '/') );
+				if ( $isTemporaryFileName( _file ) ) {
+					$fileDelete( _file );
 				}
 			}
 		</cfscript>
@@ -1425,15 +1425,15 @@
 			var files         = $directoryList(cssDir, '*.less');
 			var globals       = ListToArray( _getLessGlobals() );
 			var i             = 0;
-			var file          = "";
+			var _file          = "";
 			var imports       = "";
 			var importStruct  = "";
 
 
 			for( i=1; i LTE files.recordCount; i++ ){
-				file    = $normalizeUnixAndWindowsPaths( $listAppend( files.directory[i], files.name[i], '/') );
-				if ( not $isTemporaryFileName( file ) ) {
-					imports = ListAppend( imports, _readLessImports( file ) );
+				_file    = $normalizeUnixAndWindowsPaths( $listAppend( files.directory[i], files.name[i], '/') );
+				if ( not $isTemporaryFileName( _file ) ) {
+					imports = ListAppend( imports, _readLessImports( _file ) );
 				}
 			}
 

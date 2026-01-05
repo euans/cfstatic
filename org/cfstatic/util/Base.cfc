@@ -340,13 +340,13 @@
 	</cffunction>
 
 	<cffunction name="$ensureFullFilePath" access="private" returntype="string" output="false">
-		<cfargument name="file" type="string" required="true" />
+		<cfargument name="_file" type="string" required="true" />
 
 		<cfscript>
-			if ( fileExists( ExpandPath( file ) ) ) {
-				return ExpandPath( file );
+			if ( fileExists( ExpandPath( _file ) ) ) {
+				return ExpandPath( _file );
 			}
-			return file;
+			return _file;
 		</cfscript>
 	</cffunction>
 

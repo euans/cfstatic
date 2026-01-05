@@ -204,20 +204,20 @@
 
 				if ( not package.staticFileExists( path ) ) {
 					package.addStaticFile( path );
-					file = package.getStaticFile( path );
+					_file = package.getStaticFile( path );
 
-					_addDependentFiles( file, dependencies );
+					_addDependentFiles( _file, dependencies );
 				}
 			}
 		</cfscript>
 	</cffunction>
 
 	<cffunction name="_addDependentFiles" access="private" returntype="void" output="false">
-		<cfargument name="file"         type="any"    required="true" />
+		<cfargument name="_file"         type="any"    required="true" />
 		<cfargument name="dependencies" type="struct" required="true" />
 
 		<cfscript>
-			var dependencyArray = _getFileDependencies( file, dependencies );
+			var dependencyArray = _getFileDependencies( _file, dependencies );
 			var dependency      = "";
 			var package         = "";
 			var i               = "";
@@ -240,20 +240,20 @@
 					}
 				}
 
-				file.addDependency( getPackage( package ).getStaticFile( dependency ) );
+				_file.addDependency( getPackage( package ).getStaticFile( dependency ) );
 			}
 
-			_setConditionalDependencies( file, dependencies );
+			_setConditionalDependencies( _file, dependencies );
 		</cfscript>
 	</cffunction>
 
 	<cffunction name="_getFileDependencies" access="private" returntype="array" output="false">
-		<cfargument name="file"         type="any"    required="true" />
+		<cfargument name="_file"         type="any"    required="true" />
 		<cfargument name="dependencies" type="struct" required="true" />
 
 		<cfscript>
-			var dependencyArray = file.getProperty( 'depends', ArrayNew(1), 'array' );
-			var path            = file.getPath();
+			var dependencyArray = _file.getProperty( 'depends', ArrayNew(1), 'array' );
+			var path            = _file.getPath();
 
 			if ( StructCount( dependencies ) and StructKeyExists( dependencies.regular, path ) ) {
 				dependencyArray = $ArrayMerge( dependencyArray, dependencies.regular[ path ] );
@@ -264,11 +264,11 @@
 	</cffunction>
 
 	<cffunction name="_setConditionalDependencies" access="private" returntype="void" output="false">
-		<cfargument name="file"         type="any"    required="true" />
+		<cfargument name="_file"         type="any"    required="true" />
 		<cfargument name="dependencies" type="struct" required="true" />
 
 		<cfscript>
-			var path = file.getPath();
+			var path = _file.getPath();
 
 			if ( StructCount( dependencies ) and StructKeyExists( dependencies.conditional, path ) ) {
 				file.setConditionalDependencies( dependencies.conditional[ path ] );
